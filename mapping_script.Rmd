@@ -57,11 +57,11 @@ qmplot(lon, lat, data = dat3, size = violent_crime)
 
 ```
 
-```{r
+```{r}
 addCircleMarkers(
     radius = ~ifelse(type == "ship", 6, 10),
     color = ~pal(type),
     stroke = FALSE, fillOpacity = 0.5
-  )}
+  )
 
 ```
