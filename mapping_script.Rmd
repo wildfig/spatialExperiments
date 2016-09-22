@@ -1,0 +1,67 @@
+---
+title: "Spatial Mapping Examples"
+output: html_notebook
+date: "22 Sept 2016""
+---
+
+"The Marshall Project has collected and analyzed four decades of FBI data “on the most serious violent crimes in 68 police jurisdictions.” The FBI data covers 1975 through 2014; the reporters “also obtained data directly from 61 local agencies for 2015 — a period for which the FBI has not yet released its numbers.” Between 2010 and 2015, violent crime increased most in Milwaukee (+11%) and declined most in Prince George’s County, Md. (-22%).""
+
+Data was derived from GitHub: https://github.com/themarshallproject/city-crime
+
+
+```{r}
+library(readr)
+library(dplyr)
+ucr_crime <- read_csv("~/Downloads/city-crime-master/data/ucr_crime_1975_2015.csv")
+head(ucr_crime)
+```
+
+```{r}
+dat2 <- tidyr::separate(ucr_crime, department_name, c("city", "state"), sep = ",")
+head(dat2)
+unique(dat2$city)
+```
+
+
+```{r}
+library(ggmap)                                   
+cities <- unique(dat2$city)                          # Create a list of the unique cities
+#loc <- geocode(cities, output = "latlon")            # derive lat/lon for each city from ggmap API
+
+loc.dat <- cbind(cities, loc)
+head(loc.dat)
+colnames(loc.dat)[1] <- "city"
+
+loc.dat <- dplyr::filter(loc.dat, cities!="National")
+head(loc.dat)
+```
+
+
+```{r}
+library(leaflet)
+
+leaflet(data = loc.dat) %>% 
+  addTiles() %>%
+  addMarkers(~lon, ~lat, popup = ~as.character(city))
+```
+
+
+```{r}
+#remerge the data
+head(loc.dat)
+head(dat2)
+
+dat3 <- merge(dat2, loc.dat, by = "city", all.x = TRUE)
+dat3  <- subset(dat3, dat2$year==2014)
+qmplot(lon, lat, data = dat3, size = violent_crime)
+
+```
+
+```{r
+addCircleMarkers(
+    radius = ~ifelse(type == "ship", 6, 10),
+    color = ~pal(type),
+    stroke = FALSE, fillOpacity = 0.5
+  )}
+
+```
